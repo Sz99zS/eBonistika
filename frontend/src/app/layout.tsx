@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
-import { Sidebar } from "@/components/Sidebar";
+import { AppShell } from "@/components/layout/AppShell";
+import { fetchCollections } from "@/lib/api/collections";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -19,21 +20,18 @@ export const metadata: Metadata = {
   description: "Private numismatic and notaphily digital archive",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
+  const collections = await fetchCollections();
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full">
-        <div className="flex min-h-screen">
-          <Sidebar />
-          <main className="flex-1 px-8 py-6">{children}</main>
-        </div>
+      <body className="min-h-full bg-slate-50 text-slate-900">
+        <AppShell collections={collections}>{children}</AppShell>
       </body>
     </html>
   );
