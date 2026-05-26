@@ -3,16 +3,18 @@ import { notFound } from "next/navigation";
 import { SeriesList } from "@/components/collection/SeriesList";
 import { PageMeta } from "@/components/layout/PageMeta";
 import { fetchCollections } from "@/lib/api/collections";
-import { getMockSeriesByCollection } from "@/lib/mock-data";
+import { fetchSeriesByCollection } from "@/lib/api/series";
 
 export default async function CollectionPage({ params }: PageProps<"/collections/[id]">) {
   const { id } = await params;
 
-  const collections = await fetchCollections();
+  const [collections, series] = await Promise.all([
+    fetchCollections(),
+    fetchSeriesByCollection(id),
+  ]);
+
   const collection = collections.find((c) => c.id === id);
   if (!collection) notFound();
-
-  const series = getMockSeriesByCollection(id);
 
   return (
     <>

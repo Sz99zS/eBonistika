@@ -3,22 +3,22 @@ import { notFound } from "next/navigation";
 import { PageMeta } from "@/components/layout/PageMeta";
 import { ItemsGrid } from "@/components/series/ItemsGrid";
 import { fetchCollections } from "@/lib/api/collections";
-import {
-  getMockItemsBySeries,
-  getMockSeriesById,
-} from "@/lib/mock-data";
+import { fetchItemsBySeries } from "@/lib/api/items";
+import { fetchSeriesById } from "@/lib/api/series";
 
 export default async function SeriesPage({
   params,
 }: PageProps<"/collections/[id]/series/[seriesId]">) {
   const { id, seriesId } = await params;
 
-  const collections = await fetchCollections();
-  const collection = collections.find((c) => c.id === id);
-  const series = getMockSeriesById(seriesId);
-  if (!collection || !series || series.collectionId !== id) notFound();
+  const [collections, series, items] = await Promise.all([
+    fetchCollections(),
+    fetchSeriesById(seriesId),
+    fetchItemsBySeries(seriesId),
+  ]);
 
-  const items = getMockItemsBySeries(seriesId);
+  const collection = collections.find((c) => c.id === id);
+  if (!collection || !series || series.collectionId !== id) notFound();
 
   return (
     <>
