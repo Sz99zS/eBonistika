@@ -1,13 +1,14 @@
-using EBonistika.API.Data;
 using EBonistika.API.Dtos;
+using EBonistika.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EBonistika.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CollectionsController : ControllerBase
+public class CollectionsController(CollectionsService collectionsService) : ControllerBase
 {
     [HttpGet]
-    public ActionResult<IReadOnlyList<CollectionDto>> GetAll() => Ok(MockCollections.All);
+    public async Task<ActionResult<List<CollectionDto>>> GetAll() =>
+        Ok(await collectionsService.GetAllAsync());
 }

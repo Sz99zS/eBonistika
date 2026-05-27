@@ -1,19 +1,14 @@
-using EBonistika.API.Data;
 using EBonistika.API.Dtos;
+using EBonistika.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EBonistika.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ItemsController : ControllerBase
+public class ItemsController(ItemsService itemsService) : ControllerBase
 {
     [HttpGet]
-    public ActionResult<IReadOnlyList<ItemDto>> GetAll([FromQuery] Guid? seriesId)
-    {
-        var result = seriesId.HasValue
-            ? MockItems.All.Where(i => i.SeriesId == seriesId.Value)
-            : MockItems.All;
-        return Ok(result.ToList());
-    }
+    public async Task<ActionResult<List<ItemDto>>> GetAll([FromQuery] Guid? seriesId) =>
+        Ok(await itemsService.GetAllAsync(seriesId));
 }
