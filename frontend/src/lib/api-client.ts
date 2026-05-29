@@ -18,11 +18,15 @@ export async function apiFetch<T>(
 ): Promise<T> {
   const url = `${API_BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 
+  // Для запросов с JSON-телом обязателен Content-Type, иначе ASP.NET не забиндит модель.
+  const hasBody = init.body !== undefined && init.body !== null;
+
   const response = await fetch(url, {
     credentials: "include",
     ...init,
     headers: {
       Accept: "application/json",
+      ...(hasBody ? { "Content-Type": "application/json" } : {}),
       ...init.headers,
     },
   });
@@ -36,4 +40,18 @@ export async function apiFetch<T>(
   }
 
   return (await response.json()) as T;
+}
+
+/** POST/PUT с JSON-телом. Возвращает распарсенный ответ (или undefined при 204). */
+export function mutate<T>(
+  path: string,
+  method: "POST" | "PUT" | "PATCH",
+  body: unknown,
+): Promise<T> {
+  return apiFetch<T>(path, { method, body: JSON.stringify(body), cache: "no-store" });
+}
+
+/** DELETE. Ожидает 204. */
+export function remove(path: string): Promise<void> {
+  return apiFetch<void>(path, { method: "DELETE", cache: "no-store" });
 }

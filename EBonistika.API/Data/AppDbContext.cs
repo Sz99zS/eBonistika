@@ -35,6 +35,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(i => i.PurchasePrice).HasColumnType("numeric(18,2)");
         });
 
+        // TODO (Ваня): после добавления Collection.CreatedAt и Item.IsOwned — проставить дефолты
+        // в сид-данных ниже (CreatedAt = литеральная дата, IsOwned = true). См. CRUD_CONTRACT.md (раздел 0).
+
         // ── Seed data ──────────────────────────────────────────────────────────
 
         var col1 = Guid.Parse("11111111-0000-0000-0000-000000000001");

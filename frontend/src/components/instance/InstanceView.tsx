@@ -2,7 +2,11 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
+import { ItemFormModal } from "@/components/series/ItemFormModal";
+import { deleteItem } from "@/lib/api/items";
+import { mutationErrorMessage } from "@/lib/api-error";
 import type { Item } from "@/types";
 
 function CoinFace({ label, item }: { label: string; item: Item }) {
@@ -48,6 +52,22 @@ export function InstanceView({
   closeHref: string;
 }) {
   const router = useRouter();
+  const [editing, setEditing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete() {
+    if (deleting) return;
+    if (!window.confirm("Удалить этот предмет?")) return;
+    setDeleting(true);
+    try {
+      await deleteItem(item.id);
+      router.push(closeHref);
+      router.refresh();
+    } catch (err) {
+      window.alert(mutationErrorMessage(err));
+      setDeleting(false);
+    }
+  }
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -99,6 +119,7 @@ export function InstanceView({
         <div className="flex items-center justify-end gap-2">
           <button
             type="button"
+            onClick={() => setEditing(true)}
             className="inline-flex items-center gap-2 rounded-md border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 transition hover:bg-indigo-100"
           >
             <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -109,7 +130,9 @@ export function InstanceView({
           </button>
           <button
             type="button"
-            className="inline-flex items-center gap-2 rounded-md border border-rose-200 bg-rose-50 px-3 py-1.5 text-sm font-medium text-rose-700 transition hover:bg-rose-100"
+            onClick={handleDelete}
+            disabled={deleting}
+            className="inline-flex items-center gap-2 rounded-md border border-rose-200 bg-rose-50 px-3 py-1.5 text-sm font-medium text-rose-700 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
               <path d="M3 6h18" />
@@ -122,7 +145,20 @@ export function InstanceView({
 
         {/* Passport */}
         <section className="rounded-xl border border-slate-200 bg-white p-5">
-          <SectionTitle>Паспорт</SectionTitle>
+          <div className="flex items-start justify-between">
+            <SectionTitle>Паспорт</SectionTitle>
+            {item.isOwned !== undefined && (
+              <span
+                className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
+                  item.isOwned
+                    ? "bg-emerald-50 text-emerald-700"
+                    : "bg-amber-50 text-amber-700"
+                }`}
+              >
+                {item.isOwned ? "В коллекции" : "В поиске"}
+              </span>
+            )}
+          </div>
           <div className="flex items-baseline gap-2">
             <span className="text-4xl font-bold tracking-tight text-slate-900">{item.nominal}</span>
             <span className="text-lg font-medium text-slate-600">{item.currency}</span>
@@ -177,6 +213,10 @@ export function InstanceView({
           />
         </section>
       </div>
+
+      {editing && (
+        <ItemFormModal mode="edit" item={item} onClose={() => setEditing(false)} />
+      )}
     </div>
   );
 }

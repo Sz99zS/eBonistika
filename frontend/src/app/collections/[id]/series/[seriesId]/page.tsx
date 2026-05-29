@@ -37,7 +37,13 @@ export default async function SeriesPage({
           </p>
         </div>
 
-        <ItemsGrid collectionId={collection.id} seriesId={series.id} items={items} />
+        <ItemsGrid
+          collectionId={collection.id}
+          seriesId={series.id}
+          items={items}
+          seriesYearFrom={series.yearFrom}
+          seriesYearTo={series.yearTo}
+        />
       </section>
     </>
   );

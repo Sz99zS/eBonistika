@@ -1,5 +1,7 @@
 namespace EBonistika.API.Dtos;
 
+// TODO (Ваня): добавить поле `bool IsOwned` (после Notes) + CreateItemDto/UpdateItemDto.
+// См. CRUD_CONTRACT.md (раздел 4). Фронт уже читает item.isOwned.
 public record ItemDto(
     Guid Id,
     Guid CollectionId,

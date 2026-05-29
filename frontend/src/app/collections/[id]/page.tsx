@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { CollectionHeaderActions } from "@/components/collection/CollectionHeaderActions";
 import { SeriesList } from "@/components/collection/SeriesList";
 import { PageMeta } from "@/components/layout/PageMeta";
 import { fetchCollections } from "@/lib/api/collections";
@@ -25,8 +26,13 @@ export default async function CollectionPage({ params }: PageProps<"/collections
         ]}
       />
       <section className="mx-auto max-w-5xl">
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{collection.name}</h1>
-        <p className="mt-1 text-sm text-slate-500">Серии в этой коллекции</p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{collection.name}</h1>
+            <p className="mt-1 text-sm text-slate-500">Серии в этой коллекции</p>
+          </div>
+          <CollectionHeaderActions collection={collection} />
+        </div>
         <div className="mt-6">
           <SeriesList collectionId={collection.id} series={series} />
         </div>

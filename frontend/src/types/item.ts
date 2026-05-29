@@ -32,6 +32,10 @@ export interface Item {
 
   notes: string;
 
+  // «в коллекции» (true) / «в поиске» (false). Заполняется бэком (см. CRUD_CONTRACT.md, раздел 4).
+  // Опционален, пока бэк не добавил IsOwned в ItemDto.
+  isOwned?: boolean;
+
   obverseUrl: string | null;
   reverseUrl: string | null;
 }
