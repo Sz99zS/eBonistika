@@ -12,10 +12,24 @@ public class ItemsController(ItemsService itemsService) : ControllerBase
     public async Task<ActionResult<List<ItemDto>>> GetAll([FromQuery] Guid? seriesId) =>
         Ok(await itemsService.GetAllAsync(seriesId));
 
-    // TODO (Ваня): добавить эндпоинты CRUD — см. CRUD_CONTRACT.md (раздел 4):
-    //   POST   /api/items        <- CreateItemDto (SeriesId + поля, без CollectionId) -> 201 ItemDto
-    //   PUT    /api/items/{id}   <- UpdateItemDto (без SeriesId/CollectionId) -> 200 / 404
-    //   DELETE /api/items/{id}   -> 204 / 404
-    // Расширить ItemDto: + IsOwned. POST: CollectionId взять из Series по SeriesId.
-    // Фото (ObverseUrl/ReverseUrl) в этой итерации не трогаем — отдельная таска.
+    [HttpPost]
+    public async Task<ActionResult<ItemDto>> Create([FromBody] CreateItemDto dto)
+    {
+        var item = await itemsService.CreateAsync(dto);
+        return item is null ? NotFound() : CreatedAtAction(nameof(GetAll), new { seriesId = item.SeriesId }, item);
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<ItemDto>> Update(Guid id, [FromBody] UpdateItemDto dto)
+    {
+        var item = await itemsService.UpdateAsync(id, dto);
+        return item is null ? NotFound() : Ok(item);
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var deleted = await itemsService.DeleteAsync(id);
+        return deleted ? NoContent() : NotFound();
+    }
 }

@@ -1,7 +1,5 @@
 namespace EBonistika.API.Dtos;
 
-// TODO (Ваня): добавить CreateSeriesDto / UpdateSeriesDto — см. CRUD_CONTRACT.md (раздел 3).
-// Сам SeriesDto менять не нужно.
 public record SeriesDto(
     Guid Id,
     Guid CollectionId,
@@ -11,3 +9,6 @@ public record SeriesDto(
     DateTimeOffset CreatedAt,
     int ItemCount
     );
+
+public record CreateSeriesDto(Guid CollectionId, string Name, int YearFrom, int YearTo);
+public record UpdateSeriesDto(string Name, int YearFrom, int YearTo);

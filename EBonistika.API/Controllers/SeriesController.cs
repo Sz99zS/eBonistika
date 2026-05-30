@@ -19,9 +19,24 @@ public class SeriesController(SeriesService seriesService) : ControllerBase
         return series is null ? NotFound() : Ok(series);
     }
 
-    // TODO (Ваня): добавить эндпоинты CRUD — см. CRUD_CONTRACT.md (раздел 3):
-    //   POST   /api/series        <- CreateSeriesDto { CollectionId, Name, YearFrom, YearTo } -> 201 SeriesDto
-    //   PUT    /api/series/{id}   <- UpdateSeriesDto { Name, YearFrom, YearTo }  (CollectionId менять нельзя) -> 200 / 404
-    //   DELETE /api/series/{id}   -> 204 / 404  (каскад на Items уже настроен)
-    // CreatedAt ставит бэк; проверить существование CollectionId при POST.
+    [HttpPost]
+    public async Task<ActionResult<SeriesDto>> Create([FromBody] CreateSeriesDto dto)
+    {
+        var series = await seriesService.CreateAsync(dto);
+        return series is null ? NotFound() : CreatedAtAction(nameof(GetById), new { id = series.Id }, series);
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<SeriesDto>> Update(Guid id, [FromBody] UpdateSeriesDto dto)
+    {
+        var series = await seriesService.UpdateAsync(id, dto);
+        return series is null ? NotFound() : Ok(series);
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var deleted = await seriesService.DeleteAsync(id);
+        return deleted ? NoContent() : NotFound();
+    }
 }

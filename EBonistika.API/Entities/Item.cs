@@ -18,10 +18,7 @@ public class Item
     public string? PurchaseCurrency { get; set; }
     public DateTimeOffset? PurchaseDate { get; set; }
     public string Notes { get; set; } = string.Empty;
-
-    // TODO (Ваня): добавить `public bool IsOwned { get; set; }` + миграцию.
-    // true = «в коллекции», false = «в поиске». Default true; в сиде всем true.
-    // Подробности — см. CRUD_CONTRACT.md (раздел 0 и 4).
+    public bool IsOwned { get; set; }
 
     public string? ObverseUrl { get; set; }
     public string? ReverseUrl { get; set; }

@@ -12,10 +12,31 @@ public class CollectionsController(CollectionsService collectionsService) : Cont
     public async Task<ActionResult<List<CollectionDto>>> GetAll() =>
         Ok(await collectionsService.GetAllAsync());
 
-    // TODO (Ваня): добавить эндпоинты CRUD — см. CRUD_CONTRACT.md (раздел 2):
-    //   GET    /api/collections/{id}   -> CollectionDto / 404
-    //   POST   /api/collections        <- CreateCollectionDto { Name } -> 201 CollectionDto
-    //   PUT    /api/collections/{id}   <- UpdateCollectionDto { Name } -> 200 / 404
-    //   DELETE /api/collections/{id}   -> 204 / 404  (каскад уже настроен в AppDbContext)
-    // Расширить CollectionDto: + CreatedAt, SeriesCount, ItemCount.
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<CollectionDto>> GetById(Guid id)
+    {
+        var collection = await collectionsService.GetByIdAsync(id);
+        return collection is null ? NotFound() : Ok(collection);
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<CollectionDto>> Create([FromBody] CreateCollectionDto dto)
+    {
+        var collection = await collectionsService.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = collection.Id }, collection);
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<CollectionDto>> Update(Guid id, [FromBody] UpdateCollectionDto dto)
+    {
+        var collection = await collectionsService.UpdateAsync(id, dto);
+        return collection is null ? NotFound() : Ok(collection);
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var deleted = await collectionsService.DeleteAsync(id);
+        return deleted ? NoContent() : NotFound();
+    }
 }
